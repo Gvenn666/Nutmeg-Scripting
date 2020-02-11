@@ -1,8 +1,10 @@
 package nutmeg.scripting.core;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -17,12 +19,16 @@ public class ScriptProcessor implements ScriptAPI{
 	private volatile HashMap<String, Integer> varMap;
 	
 	
-	private int PC = 0x0000;
+	private int
+	PC = 0x0000,
+	datPtr = 0x0000;
 	
-	public ScriptProcessor(Script _script) {
+	public ScriptProcessor(Script _script, int heapSizeKW) {
 		stack = new Stack<Integer>();
 		callStack = new Stack<Integer>();
 		script = _script;
+		heap = new int[heapSizeKW * 1000];
+		varMap = new HashMap<String, Integer>();
 		for(int i = 0; i < script.size(); i++) {
 			String line = script.getLineAt(i);
 			line = line.trim();
@@ -45,13 +51,13 @@ public class ScriptProcessor implements ScriptAPI{
 		
 	}
 	
-//	public Thread runAsync() {
-//		Thread t = new Thread(() -> {
-//			run();
-//		});
-//		t.start();
-//		return t;
-//	}
+	public Thread runAsync(int frequency) {
+		Thread t = new Thread(() -> {
+			run(frequency);
+		});
+		t.start();
+		return t;
+	}
 	
 	private boolean
 	negativeFlag, zeroFlag;
@@ -74,6 +80,8 @@ public class ScriptProcessor implements ScriptAPI{
 			
 			case "SYS_PRINTLN": while(stack.peek() > 0) System.out.println((char) stack.pop().intValue()); break;
 			case "SYS_READLN": s0 = stdin.nextLine(); stack.push(0); for(int i = s0.length(); i > 0; i--) { stack.push((int) s0.toCharArray()[i]); } break;
+			
+			case "SYS_READ_RAW_INTS": varMap.put(parts[1], datPtr); loadRawData(new File(parts[2]));
 			
 			case "ADD": a = stack.pop(); b = stack.pop(); stack.push(a + b); break;
 			case "SUBTRACT": a = stack.pop(); b = stack.pop(); stack.push(a - b); break;
@@ -99,10 +107,16 @@ public class ScriptProcessor implements ScriptAPI{
 			case "JUMP_SUBROUTINE": callStack.push(PC); PC = Integer.parseInt(parts[1]); break;
 			case "RETURN": PC = callStack.pop(); break;
 			
+			case "LOAD": stack.push(heap[Integer.parseInt(parts[1])]); break;
+			case "STORE": heap[Integer.parseInt(parts[1])] = stack.pop(); break;
+			
+			case "STORE_REF": heap[varMap.get(parts[1])] = stack.pop(); break;
+			
 		}
-		
-		negativeFlag = (stack.peek() < 0);
-		zeroFlag = (stack.peek() == 0);
+		if(!stack.isEmpty()) {
+//		negativeFlag = (stack.peek() < 0);
+//		zeroFlag = (stack.peek() == 0);
+		}
 		
 		return 0;
 		
@@ -110,8 +124,9 @@ public class ScriptProcessor implements ScriptAPI{
 	
 	Scanner stdin = new Scanner(System.in);
 	
-	public void run() {
+	public void run(int frequency) {
 		while(!script.isOutOfRange(PC)) {
+			try {  Thread.sleep((1 / frequency) * 1000); } catch (InterruptedException e) { e.printStackTrace(); }
   			if(clock() > 0) return;
 		}
 	}
@@ -122,6 +137,22 @@ public class ScriptProcessor implements ScriptAPI{
 			return varMap.get(name);
 		} else {
 			return -1;
+		}
+	}
+	
+	public int getVariable(int index) {
+		return heap[index];
+	}
+	
+	private void loadRawData(File file) {
+		try {
+			DataInputStream input = new DataInputStream(new FileInputStream(file));
+			if(file.length() > (heap.length - datPtr)) throw new RuntimeException("File'"+file.getName()+"' cannot be loaded into Heap, "+file.length()+"B");
+			for(int i = 0; i < file.length() / Integer.BYTES; i++) {
+				heap[datPtr++] = input.readInt();
+			}
+		} catch(IOException ex) {
+			
 		}
 	}
 	

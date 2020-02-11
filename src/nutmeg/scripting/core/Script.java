@@ -18,7 +18,7 @@ public class Script {
 	}
 	
 	public Script(String[] _source) {
-		source = source;
+		source = _source;
 	}
 	
 	public Script(String pathToScript) {
