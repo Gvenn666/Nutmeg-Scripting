@@ -81,7 +81,7 @@ public class ScriptProcessor implements ScriptAPI{
 			case "SYS_PRINTLN": while(stack.peek() > 0) System.out.println((char) stack.pop().intValue()); break;
 			case "SYS_READLN": s0 = stdin.nextLine(); stack.push(0); for(int i = s0.length(); i > 0; i--) { stack.push((int) s0.toCharArray()[i]); } break;
 			
-			case "SYS_READ_RAW_INTS": varMap.put(parts[1], datPtr); loadRawData(new File(parts[2]));
+			case "SYS_READ_RAW_INTS": varMap.put(parts[1], datPtr); loadRawData(new File(parts[2])); break;
 			
 			case "ADD": a = stack.pop(); b = stack.pop(); stack.push(a + b); break;
 			case "SUBTRACT": a = stack.pop(); b = stack.pop(); stack.push(a - b); break;
@@ -114,8 +114,8 @@ public class ScriptProcessor implements ScriptAPI{
 			
 		}
 		if(!stack.isEmpty()) {
-//		negativeFlag = (stack.peek() < 0);
-//		zeroFlag = (stack.peek() == 0);
+			negativeFlag = (stack.peek() < 0);
+			zeroFlag = (stack.peek() == 0);
 		}
 		
 		return 0;
