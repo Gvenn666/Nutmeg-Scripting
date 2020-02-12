@@ -5,12 +5,9 @@ public class ExampleMain {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		String[] source = {
-				"#DEFINE output 0",
-				"PUSH_LIT 10",
-				"PUSH_LIT 20",
-				"ADD",
-				"STORE_REF output",
-				"#LABEL END",
+				"RANDOM",
+				"SIN",
+				"STORE 0",
 				"HALT"
 		};
 		
@@ -18,9 +15,9 @@ public class ExampleMain {
 		System.out.println(test);
 		LowLevelScriptProcessor proccesor = new LowLevelScriptProcessor(test, 1);
 		
-		proccesor.run(1);
+		proccesor.run(10);
 		
-		System.out.println(proccesor.getVariable("output"));
+		System.out.println(proccesor.getVariable(0));
 	}
 
 }

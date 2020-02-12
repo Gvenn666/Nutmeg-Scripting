@@ -1,11 +1,11 @@
 package nutmeg.scripting.core;
 import java.io.File;
-import java.util.HashMap;
+
 
 import nutmeg.core.util.files.*;
 public class LowLevelScript {
 	private String[] source;
-	private scriptState  state = scriptState.WAITING;
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
