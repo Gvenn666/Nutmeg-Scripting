@@ -7,15 +7,18 @@ public class ExampleMain {
 		String[] source = {
 				"#DEFINE output 0",
 				"PUSH_LIT 10",
+				"PUSH_LIT 20",
+				"ADD",
 				"STORE_REF output",
+				"#LABEL END",
 				"HALT"
 		};
 		
-		Script test = new Script(source);
+		LowLevelScript test = new LowLevelScript(source);
+		System.out.println(test);
+		LowLevelScriptProcessor proccesor = new LowLevelScriptProcessor(test, 1);
 		
-		ScriptProcessor proccesor = new ScriptProcessor(test, 1);
-		
-		proccesor.run(10);
+		proccesor.run(1);
 		
 		System.out.println(proccesor.getVariable("output"));
 	}

@@ -1,15 +1,16 @@
 package nutmeg.scripting.core;
 import java.io.File;
+import java.util.HashMap;
 
 import nutmeg.core.util.files.*;
-public class Script {
+public class LowLevelScript {
 	private String[] source;
 	private scriptState  state = scriptState.WAITING;
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		
-		builder.append("Version: "+1);
+		builder.append("Version: "+1+"\n");
 		for(int i = 0; i < source.length; i++) {
 			builder.append("["+i+"] "+source[i]+"\n");
 		}
@@ -17,11 +18,16 @@ public class Script {
 		return builder.toString();
 	}
 	
-	public Script(String[] _source) {
+	public LowLevelScript(String[] _source) {
 		source = _source;
 	}
 	
-	public Script(String pathToScript) {
+	/**
+	 * 
+	 * @param String - Path To The Script
+	 * @return Script - A Script Containing the textfile data of the file
+	 */
+	public LowLevelScript(String pathToScript) {
 		this(FileLoader.get().loadTextFile(new File(pathToScript)));
 	} 
 	

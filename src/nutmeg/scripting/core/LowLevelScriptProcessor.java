@@ -12,8 +12,8 @@ import java.util.Stack;
 
 import nutmeg.scripting.api.ScriptAPI;
 
-public class ScriptProcessor implements ScriptAPI{
-	private Script script;
+public class LowLevelScriptProcessor implements ScriptAPI{
+	private LowLevelScript script;
 	private Stack<Integer> stack, callStack;
 	private int[] heap = new int[256];
 	private volatile HashMap<String, Integer> varMap;
@@ -23,7 +23,7 @@ public class ScriptProcessor implements ScriptAPI{
 	PC = 0x0000,
 	datPtr = 0x0000;
 	
-	public ScriptProcessor(Script _script, int heapSizeKW) {
+	public LowLevelScriptProcessor(LowLevelScript _script, int heapSizeKW) {
 		stack = new Stack<Integer>();
 		callStack = new Stack<Integer>();
 		script = _script;
@@ -134,7 +134,7 @@ public class ScriptProcessor implements ScriptAPI{
 	@Override
 	public int getVariable(String name) {
 		if(varMap.containsKey(name)) {
-			return varMap.get(name);
+			return heap[varMap.get(name)];
 		} else {
 			return -1;
 		}
